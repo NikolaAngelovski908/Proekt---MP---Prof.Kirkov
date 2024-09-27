@@ -1,0 +1,43 @@
+""" Prorgam za menadzirane na dokument. Tazi programa predlaga osnoven, no polezen nachin za upravlenie na dokumenti
+"""
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+documents = {}
+
+@app.route('/document', methods=['POST'])
+def sozdai_dokument():
+        """
+      sozdavane na dokument
+        """
+    doc_id = request.json.get('id')
+    content = request.json.get('content')
+    if doc_id and content:
+        doc_id = request.json.get('id')
+        return jsonify({"message": "Dokument sozdaden."}), 201
+    return jsonify({"error": "nevaliden vhod."}), 400
+
+@app.route('/document/<doc_id>', methods=['GET'])
+def get_document(doc_id):
+        """
+            Polucavame dokumenta po samia ID.
+        """
+    content = documents.get(doc_id)
+    if content:
+        return jsonify({"id": doc_id, "content": content}), 200
+    return jsonify({"error": "dokumenta nemoz da se nameri."}), 404
+
+@app.route('/documents', methods=['GET'])
+def list_documents():
+    return jsonify(documents), 200
+
+@app.route('/document/<doc_id>', methods=['DELETE'])
+def delete_document(doc_id):
+    if doc_id in documents:
+        del documents[doc_id]
+        return jsonify({"message": "Dokument e izbrisan."}), 200
+    return jsonify({"error": "Dokumenta nemoz da se nameri"}), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
