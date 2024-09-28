@@ -2,42 +2,58 @@
 """
 
 from flask import Flask, request, jsonify
+""" Flask е основният клас, request ни позволява да получаваме данни от клиентските заявки, а jsonify форматира отговорите в JSON."""
+
 
 app = Flask(__name__)
 documents = {}
+"""Създаваме инстанция на Flask приложението и инициализираме речник (documents), който ще служи за съхранение на документите."""
 
 @app.route('/document', methods=['POST'])
 def sozdai_dokument():
         """
-      sozdavane na dokument
-        """
+      sozdavane na dokument( Tази част дефинира нов маршрут (/document) за обработка на POST заявки, който създава нов документ.)
+"""
+        
     doc_id = request.json.get('id')
     content = request.json.get('content')
+""" Получаваме идентификатора и съдържанието на документа от JSON данните в заявката."""
+
     if doc_id and content:
         doc_id = request.json.get('id')
         return jsonify({"message": "Dokument sozdaden."}), 201
     return jsonify({"error": "nevaliden vhod."}), 400
 
+""" Ако идентификаторът и съдържанието са валидни, добавяме документа в речника и връщаме съобщение за успех.
+Ако не, връщаме грешка с код 400 (невалиден вход).
+"""
+
 @app.route('/document/<doc_id>', methods=['GET'])
 def get_document(doc_id):
-        """
-            Polucavame dokumenta po samia ID.
-        """
+        """Tyк дефинираме маршрут за получаване на документ по неговия идентификатор."""
+        
     content = documents.get(doc_id)
     if content:
         return jsonify({"id": doc_id, "content": content}), 200
     return jsonify({"error": "dokumenta nemoz da se nameri."}), 404
 
+"""Ако документът съществува, го връщаме с код 200. Aко документът не бъде намерен, връщаме грешка с код 404."""
+
 @app.route('/documents', methods=['GET'])
 def list_documents():
     return jsonify(documents), 200
+""" Този маршрут позволява извличането на всички документи, връщайки съдържанието на речника."""
 
 @app.route('/document/<doc_id>', methods=['DELETE'])
 def delete_document(doc_id):
+""" Тук дефинираме маршрут за изтриване на документ по идентификатор."""
+
     if doc_id in documents:
         del documents[doc_id]
         return jsonify({"message": "Dokument e izbrisan."}), 200
     return jsonify({"error": "Dokumenta nemoz da se nameri"}), 404
+"""Ако документът съществува, го изтриваме и връщаме съобщение за успех. Ако не, връщаме грешка с код 404."""
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True) """Тази част стартира приложението в режим на отладка, което е полезно за разработка."""
+"""Тази програма предоставя основен интерфейс за управление на документи с функции за създаване, получаване, изброяване и изтриване."""
